@@ -187,8 +187,26 @@ define(
       }
     };
 
+    /*
+    The isFunction implementation is taken from Lodash:
+    https://github.com/bestiejs/lodash/
+    */
+    function isFunction(value) {
+      return typeof value == 'function';
+    }
+    // fallback for older versions of Chrome and Safari
+    if (isFunction(/x/)) {
+      isFunction = function(value) {
+        return value instanceof Function || toString.call(value) == funcClass;
+      };
+    }
+
     Promise.prototype = {
       then: function(done, fail) {
+        if(!isFunction(done) && !isFunction(fail) && (done.done || done.fail)) {
+          return this.then(done.done, done.fail);
+        }
+    
         var thenPromise = new Promise();
 
         if (this.isResolved) {
