@@ -49,6 +49,30 @@ promise.reject(error) // triggers second callback
 Once a promise has been resolved or rejected, it cannot be resolved or
 rejected again.
 
+If one function is creating a Promise, it can also return a read-only Future
+to callers.  This makes it more explicit about who has responsibility for resolving the
+Promise.
+
+```javascript
+var rememberName = function() {
+  var promise = new Promise();
+  
+  setTimeout(function() {
+    promise.resolve('Newman');
+  }, 1000);
+
+  return promise.future;
+});
+
+var nameFuture = rememberName();
+
+nameFuture.then(function(name) {
+  console.log('Hello... ' + name + '.');
+});
+
+//nameFuture.resolve() -> error
+```
+
 Here is an example of a simple XHR2 wrapper written using RSVP.js:
 
 ```javascript
@@ -202,19 +226,17 @@ has implemented it!
 
 ## Event Target
 
-RSVP also provides a mixin that you can use to convert any object into
-an event target. The promises implementation uses `RSVP.EventTarget`, so
-`RSVP` exposes it for your own use.
+RSVP embeds Backbone.Events for tracking events and exposes `RSVP.mixinEvents` for your own use.
 
 ### Basic Usage
 
-The basic usage of `RSVP.EventTarget` is to mix it into an object, then
+The basic usage of `RSVP.mixinEvents` is to mix it into an object, then
 use `on` and `trigger` to register listeners and trigger them.
 
 ```javascript
 var object = {};
 
-RSVP.EventTarget.mixin(object);
+RSVP.mixinEvents(object);
 
 object.on("finished", function(event) {
   // handle event
@@ -225,12 +247,12 @@ object.trigger("finished", { detail: value });
 
 ### Prototypes
 
-You can mix `RSVP.EventTarget` into a prototype and it will work as
+You can call `RSVP.mixinEvents` on a prototype and it will work as
 expected.
 
 ```javascript
 var Person = function() {};
-RSVP.EventTarget.mixin(Person.prototype);
+RSVP.mixinEvents(Person.prototype);
 
 var yehuda = new Person();
 var tom = new Person();
@@ -247,6 +269,6 @@ yehuda.trigger("poke");
 tom.trigger("poke");
 ```
 
-The example will work as expected. If you mix `RSVP.EventTarget` into a
+The example will work as expected. If you call `RSVP.mixinEvents` on a
 constructor's prototype, each instance of that constructor will get its
 own callbacks.
