@@ -305,6 +305,7 @@ define(
 
 
     __exports__.Promise = Promise;
+    __exports__.Future = Future;
     __exports__.Event = Event;
     __exports__.EventTarget = EventTarget;
     __exports__.all = all;

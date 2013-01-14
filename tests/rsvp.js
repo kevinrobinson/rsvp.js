@@ -302,6 +302,7 @@ EventTarget.mixin(Future.prototype);
 
 
 exports.Promise = Promise;
+exports.Future = Future;
 exports.Event = Event;
 exports.EventTarget = EventTarget;
 exports.all = all;
